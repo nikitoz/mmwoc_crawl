@@ -11,9 +11,9 @@ class MmwocCrawlItem(Item):
     pass
 
 class TextItem(Item):
-    url = Field()
-    text = Field()
+	url = Field()
+	text = Field()
 
 class WocItem(Item):
-    url = Field()
-    stuff = Field()
+	url = Field()
+	stuff = Field()
