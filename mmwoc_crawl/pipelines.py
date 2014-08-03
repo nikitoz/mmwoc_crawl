@@ -1,3 +1,4 @@
+# coding=utf-8
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
@@ -9,6 +10,7 @@ from mmwoc_crawl.items import WocItem
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
 import codecs
+import operator
 
 class MmwocCrawlPipeline(object):
 	def process_item(self, item, spider):
@@ -32,6 +34,9 @@ class JsonWithEncodingPipeline(object):
 
 class ProcessPipeline(object):
 	accumulated_words = {}
+	forbidden_grammeme = {'NPRO', 'CONJ', 'PRCL', 'INTJ', 'PREP', 'PNCT', 'NUMB', 'UNKN'}
+	forbidden_words = {')', '(', '-', ',', '.', '—'}
+	words_on_graph = 32
 
 	def process_item(self, item, spider):
 		tokens = nltk.word_tokenize(item['text'])
@@ -39,7 +44,14 @@ class ProcessPipeline(object):
 		cnt = {}
 		for tok in tokens:
 			tok1 = tok.replace('.', '')
-			word = morph.parse(tok1)[0].normal_form
+			parsed = morph.parse(tok1)[0]
+			
+			if (parsed.tag.POS in self.forbidden_grammeme):
+				continue
+			word = parsed.normal_form
+			if (word in self.forbidden_words):
+				continue
+
 			if (not word in cnt):
 				cnt[word] = 0
 			cnt[word] = cnt[word] + 1
@@ -60,3 +72,9 @@ class ProcessPipeline(object):
 	def close_spider(self, spider):
 		self.file.write(json.dumps(self.accumulated_words, ensure_ascii=False))
 		self.file.close()
+		
+		sorted_file = codecs.open(spider.file_name().replace('.json', '_graph.json'), 'w', encoding='utf-8')		
+		sorted_data = sorted(self.accumulated_words.iteritems(), key=operator.itemgetter(1), reverse=True)
+		a, b = [e[0] for e in sorted_data], [e[1] for e in sorted_data]
+		sorted_file.write(json.dumps({'words' : a[0:self.words_on_graph], 'occurrences' : b[0:self.words_on_graph]} , ensure_ascii=False))
+		sorted_file.close()
