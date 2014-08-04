@@ -8,6 +8,7 @@ from scrapy.http import *
 from sets import Set
 import html2text
 import pymorphy2
+import datetime
 
 class Spider(CrawlSpider):
 	name = 'doombringer'
@@ -30,7 +31,7 @@ class Spider(CrawlSpider):
 		self.site = site
         
 	def file_name(self):
-		return self.path + self.site.replace('.', '_').replace('/', '') + '.json'
+		return self.path + self.site.replace('.', '').replace('/', '') + '_' + datetime.date().today().strftime('%d_%m_%y')
 
 	def parse_start_url(self, response):
 		return self.parse_item(response)

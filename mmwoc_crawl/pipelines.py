@@ -20,7 +20,7 @@ class JsonWithEncodingPipeline(object):
 	json_dump = ''
 
 	def open_spider(self, spider):
-		self.file = codecs.open(spider.file_name(), 'w', encoding='utf-8')
+		self.file = codecs.open(spider.file_name() + '.json', 'w', encoding='utf-8')
 
 	def process_item(self, item, spider):
 		line = json.dumps(dict(item), ensure_ascii=False) + "\n"
@@ -67,13 +67,13 @@ class ProcessPipeline(object):
 		return ret_item
 
 	def open_spider(self, spider):
-		self.file = codecs.open(spider.file_name().replace('.json', '_acc.json'), 'w', encoding='utf-8')
+		self.file = codecs.open(spider.file_name() + '_acc.json', 'w', encoding='utf-8')
 
 	def close_spider(self, spider):
 		self.file.write(json.dumps(self.accumulated_words, ensure_ascii=False))
 		self.file.close()
 		
-		sorted_file = codecs.open(spider.file_name().replace('.json', '_graph.json'), 'w', encoding='utf-8')		
+		sorted_file = codecs.open(spider.file_name() + '_graph.json', 'w', encoding='utf-8')		
 		sorted_data = sorted(self.accumulated_words.iteritems(), key=operator.itemgetter(1), reverse=True)
 		a, b = [e[0] for e in sorted_data], [e[1] for e in sorted_data]
 		sorted_file.write(json.dumps({'words' : a[0:self.words_on_graph], 'occurrences' : b[0:self.words_on_graph]} , ensure_ascii=False))
