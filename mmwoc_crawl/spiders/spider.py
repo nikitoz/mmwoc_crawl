@@ -9,6 +9,7 @@ from sets import Set
 import html2text
 import pymorphy2
 import datetime
+from scrapy.contrib.linkextractors import LinkExtractor
 
 class Spider(CrawlSpider):
 	name = 'doombringer'
@@ -18,8 +19,8 @@ class Spider(CrawlSpider):
 	path   = None
 	site = None
 	rules = (
-		Rule(SgmlLinkExtractor(unique=True), callback='parse_start_url', follow=True),
-		Rule(SgmlLinkExtractor(unique=True), callback='parse_item', follow=True),
+		Rule(LinkExtractor(unique=True), callback='parse_start_url', follow=True),
+		Rule(LinkExtractor(unique=True), callback='parse_item', follow=True),
 	)
 
 	def __init__(self, site=None, domain=None, path=None, *args, **kwargs):
@@ -31,14 +32,17 @@ class Spider(CrawlSpider):
 		self.site = site
         
 	def file_name(self):
-		return self.path + self.site.replace('.', '').replace('/', '') + '_' + datetime.date().today().strftime('%d_%m_%y')
+		return self.path + self.site.replace('.', '').replace('/', '') + '_' + datetime.date.today().strftime('%d_%m_%y')
 
 	def parse_start_url(self, response):
 		return self.parse_item(response)
 
 	def parse_item(self, response) :
 		response2 = HtmlResponse(url=response.url, body=response.body)
-		page_text = html2text.html2text(response2.body.decode(response2.encoding))
+		try:
+			page_text = html2text.html2text(response2.body.decode(response2.encoding))
+		except:
+			page_text = ''
 		item = TextItem()
 		item['url']  = response.url
 		item['text'] = page_text

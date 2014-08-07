@@ -11,8 +11,6 @@ BOT_NAME = 'mmwoc_crawl'
 SPIDER_MODULES = ['mmwoc_crawl.spiders']
 NEWSPIDER_MODULE = 'mmwoc_crawl.spiders'
 
-ALLOWED_DOMAINS = ['lenta.ru']
-
 DEPTH_LIMIT = 1
 ITEM_PIPELINES = ['mmwoc_crawl.pipelines.ProcessPipeline' 
 		  , 'mmwoc_crawl.pipelines.JsonWithEncodingPipeline']
@@ -24,3 +22,6 @@ LOG_LEVEL = 'INFO'
 DOWNLOAD_TIMEOUT = 15
 AJAXCRAWL_ENABLED = True
 
+
+
+#scrapy crawl doombringer -a site="lenta.ru" -a domain="lenta.ru" -a path="../data/"

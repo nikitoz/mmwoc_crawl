@@ -5,6 +5,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json
 import nltk
+import re
 import pymorphy2
 from mmwoc_crawl.items import WocItem
 from scrapy.xlib.pydispatch import dispatcher
@@ -72,9 +73,12 @@ class ProcessPipeline(object):
 	def close_spider(self, spider):
 		self.file.write(json.dumps(self.accumulated_words, ensure_ascii=False))
 		self.file.close()
+
+		reg = re.compile(u'^[а-яА-Я]+$', re.UNICODE)
 		
 		sorted_file = codecs.open(spider.file_name() + '_graph.json', 'w', encoding='utf-8')		
 		sorted_data = sorted(self.accumulated_words.iteritems(), key=operator.itemgetter(1), reverse=True)
-		a, b = [e[0] for e in sorted_data], [e[1] for e in sorted_data]
+		a, b = [ e[0] for e in sorted_data if (reg.match(e[0]) != None) ], [e[1] for e in sorted_data]
+			
 		sorted_file.write(json.dumps({'words' : a[0:self.words_on_graph], 'occurrences' : b[0:self.words_on_graph]} , ensure_ascii=False))
 		sorted_file.close()
