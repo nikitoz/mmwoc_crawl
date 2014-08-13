@@ -76,6 +76,7 @@ class ProcessPipeline(object):
 			client = MongoClient(MONGO_DESTINATION)
 			client['mmwocdb'].graph.insert({ "_id":key, "data":d })
 		except:
+			print 'couldn\'t write to mongo'
 			pass
 		
 
