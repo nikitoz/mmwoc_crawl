@@ -7,6 +7,7 @@ import json
 import nltk
 import re
 import pymorphy2
+from pymongo import MongoClient
 from mmwoc_crawl.items import WocItem
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
@@ -70,15 +71,27 @@ class ProcessPipeline(object):
 	def open_spider(self, spider):
 		self.file = codecs.open(spider.file_name() + '_acc.json', 'w', encoding='utf-8')
 
+	def push_to_mongo(self, d, key):
+		try:
+			client = MongoClient(MONGO_DESTINATION)
+			client['mmwocdb'].graph.insert({ "_id":key, "data":d })
+		except:
+			pass
+		
+
 	def close_spider(self, spider):
 		self.file.write(json.dumps(self.accumulated_words, ensure_ascii=False))
 		self.file.close()
 
 		reg = re.compile(u'^[а-яА-Я]+$', re.UNICODE)
 		
-		sorted_file = codecs.open(spider.file_name() + '_graph.json', 'w', encoding='utf-8')		
 		sorted_data = sorted(self.accumulated_words.iteritems(), key=operator.itemgetter(1), reverse=True)
 		a, b = [ e[0] for e in sorted_data if (reg.match(e[0]) != None) ], [e[1] for e in sorted_data]
-			
-		sorted_file.write(json.dumps({'words' : a[0:self.words_on_graph], 'occurrences' : b[0:self.words_on_graph]} , ensure_ascii=False))
+		final_dict = {'words' : a[0:self.words_on_graph], 'occurrences' : b[0:self.words_on_graph]}
+
+		key = spider.file_name()
+		sorted_file = codecs.open(key + '_graph.json', 'w', encoding='utf-8')
+		sorted_file.write(json.dumps(final_dict, ensure_ascii=False))
 		sorted_file.close()
+
+		self.push_to_mongo(final_dict, key)

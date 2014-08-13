@@ -21,7 +21,4 @@ CONCURRENT_REQUESTS = 100
 LOG_LEVEL = 'INFO'
 DOWNLOAD_TIMEOUT = 15
 AJAXCRAWL_ENABLED = True
-
-
-
-#scrapy crawl doombringer -a site="lenta.ru" -a domain="lenta.ru" -a path="../data/"
+MONGO_DESTINATION = 'mongodb://localhost:27017/'
