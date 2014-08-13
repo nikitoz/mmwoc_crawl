@@ -40,7 +40,7 @@ class Spider(CrawlSpider):
 		return self.path + self.key()
 
 	def key(self):
-		return self.mkey
+		return str(self.mkey)
 
 	def parse_start_url(self, response):
 		return self.parse_item(response)

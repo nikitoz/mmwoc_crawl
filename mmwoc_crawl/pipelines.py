@@ -77,7 +77,7 @@ class ProcessPipeline(object):
 		try:
 			client = MongoClient(MONGO_DESTINATION)
 			if (client['mmwocdb'].authenticate(user, password)) :
-				client['mmwocdb'].graph.update({'_id':_id}, {'data':d}, True)
+				client['mmwocdb'].graph.update({'_id':_id}, {$set : {'_id' : _id, 'data':d}}, True)
 			else :
 				print 'Mongo auth failed'
 		except pymongo.errors.PyMongoError as e:
