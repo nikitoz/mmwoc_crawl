@@ -71,10 +71,11 @@ class ProcessPipeline(object):
 	def open_spider(self, spider):
 		self.file = codecs.open(spider.file_name() + '_acc.json', 'w', encoding='utf-8')
 
-	def push_to_mongo(self, d, key):
+	def push_to_mongo(self, d, _id, user, password):
 		try:
 			client = MongoClient(MONGO_DESTINATION)
-			client['mmwocdb'].graph.insert({ "_id":key, "data":d })
+			client['mmwocdb'].authenticate(user, password)
+			client['mmwocdb'].graph.insert({ "_id":_id, "data":d })
 		except:
 			print 'couldn\'t write to mongo'
 			pass
@@ -95,4 +96,4 @@ class ProcessPipeline(object):
 		sorted_file.write(json.dumps(final_dict, ensure_ascii=False))
 		sorted_file.close()
 
-		self.push_to_mongo(final_dict, key)
+		self.push_to_mongo(final_dict, key, spider.mongo_user(), spider.mongo_password())

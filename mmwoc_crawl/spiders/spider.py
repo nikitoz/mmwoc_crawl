@@ -18,12 +18,14 @@ class Spider(CrawlSpider):
 	domain = None
 	path   = None
 	site = None
+	mpass = None
+	muser = None
 	rules = (
 		Rule(LinkExtractor(unique=True), callback='parse_start_url', follow=True),
 		Rule(LinkExtractor(unique=True), callback='parse_item', follow=True),
 	)
 
-	def __init__(self, site=None, domain=None, path=None, *args, **kwargs):
+	def __init__(self, site=None, domain=None, path=None, muser=None, mpass=None, *args, **kwargs):
 		super(Spider, self).__init__(*args, **kwargs)
 		self.allowed_domains = [domain]
 		self.start_urls = ['http://' + site]
@@ -36,6 +38,12 @@ class Spider(CrawlSpider):
 
 	def parse_start_url(self, response):
 		return self.parse_item(response)
+
+	def mongo_user(self):
+		return self.muser
+
+	def mongo_password(self):
+		return self.mpass
 
 	def parse_item(self, response) :
 		response2 = HtmlResponse(url=response.url, body=response.body)
