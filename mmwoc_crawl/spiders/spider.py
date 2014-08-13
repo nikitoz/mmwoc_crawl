@@ -51,6 +51,9 @@ class Spider(CrawlSpider):
 	def mongo_password(self):
 		return self.mpass
 
+	def site_name(self):
+		return self.site
+
 	def parse_item(self, response) :
 		response2 = HtmlResponse(url=response.url, body=response.body)
 		try:

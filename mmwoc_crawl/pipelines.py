@@ -15,6 +15,7 @@ from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
 import codecs
 import operator
+import datetime
 
 class MmwocCrawlPipeline(object):
 	def process_item(self, item, spider):
@@ -73,11 +74,11 @@ class ProcessPipeline(object):
 	def open_spider(self, spider):
 		self.file = codecs.open(spider.file_name() + '_acc.json', 'w', encoding='utf-8')
 
-	def push_to_mongo(self, d, _id, user, password):
+	def push_to_mongo(self, d, _id, user, password, sitename):
 		try:
 			client = MongoClient(MONGO_DESTINATION)
 			if (client['mmwocdb'].authenticate(user, password)) :
-				client['mmwocdb'].graph.update({'_id':_id}, {'$set' : {'data':d}}, True)
+				client['mmwocdb'].graph.update({'_id':_id}, {'$set' : {'data':d, 'site':sitename, 'date' : datetime.datetime.utcnow() }}, True)
 			else :
 				print 'Mongo auth failed'
 		except pymongo.errors.PyMongoError as e:
@@ -99,4 +100,4 @@ class ProcessPipeline(object):
 		sorted_file.write(json.dumps(final_dict, ensure_ascii=False))
 		sorted_file.close()
 		
-		self.push_to_mongo(final_dict, spider.key(), spider.mongo_user(), spider.mongo_password())
+		self.push_to_mongo(final_dict, spider.key(), spider.mongo_user(), spider.mongo_password(), spider.site_name())
