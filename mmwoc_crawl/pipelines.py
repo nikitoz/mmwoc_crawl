@@ -40,7 +40,7 @@ class ProcessPipeline(object):
 	accumulated_words = {}
 	forbidden_grammeme = {'NPRO', 'CONJ', 'PRCL', 'INTJ', 'PREP', 'PNCT', 'NUMB', 'UNKN'}
 	forbidden_words = {')', '(', '-', ',', '.', '—'}
-	words_on_graph = 32
+	words_on_graph = 100
 
 	def process_item(self, item, spider):
 		tokens = nltk.word_tokenize(item['text'])
