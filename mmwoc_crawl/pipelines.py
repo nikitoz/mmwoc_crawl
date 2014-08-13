@@ -7,7 +7,7 @@ import json
 import nltk
 import re
 import pymorphy2
-from pymongo import MongoClient
+import pymongo
 from mmwoc_crawl.items import WocItem
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
@@ -74,10 +74,12 @@ class ProcessPipeline(object):
 	def push_to_mongo(self, d, _id, user, password):
 		try:
 			client = MongoClient(MONGO_DESTINATION)
-			client['mmwocdb'].authenticate(user, password)
-			client['mmwocdb'].graph.insert({ "_id":_id, "data":d })
-		except:
-			print 'couldn\'t write to mongo'
+			if (client['mmwocdb'].authenticate(user, password)) :
+				client['mmwocdb'].graph.insert({ '_id':_id, 'data':d })
+			else :
+				print 'Mongo auth failed'
+		except pymongo.errors.PyMongoError as e:
+			print str(e)
 			pass
 		
 
