@@ -9,6 +9,7 @@ import re
 import pymorphy2
 import pymongo
 from pymongo import MongoClient
+from mmwoc_crawl.settings import *
 from mmwoc_crawl.items import WocItem
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
