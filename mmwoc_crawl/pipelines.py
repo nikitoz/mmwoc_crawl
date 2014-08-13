@@ -77,7 +77,7 @@ class ProcessPipeline(object):
 		try:
 			client = MongoClient(MONGO_DESTINATION)
 			if (client['mmwocdb'].authenticate(user, password)) :
-				client['mmwocdb'].graph.insert({ '_id':_id, 'data':d })
+				client['mmwocdb'].graph.update({'_id':_id}, {'data':d}, True)
 			else :
 				print 'Mongo auth failed'
 		except pymongo.errors.PyMongoError as e:
@@ -95,9 +95,8 @@ class ProcessPipeline(object):
 		a, b = [ e[0] for e in sorted_data if (reg.match(e[0]) != None) ], [e[1] for e in sorted_data]
 		final_dict = {'words' : a[0:self.words_on_graph], 'occurrences' : b[0:self.words_on_graph]}
 
-		key = spider.file_name()
-		sorted_file = codecs.open(key + '_graph.json', 'w', encoding='utf-8')
+		sorted_file = codecs.open(spider.file_name() + '_graph.json', 'w', encoding='utf-8')
 		sorted_file.write(json.dumps(final_dict, ensure_ascii=False))
 		sorted_file.close()
-
-		self.push_to_mongo(final_dict, key, spider.mongo_user(), spider.mongo_password())
+		
+		self.push_to_mongo(final_dict, spider.key(), spider.mongo_user(), spider.mongo_password())

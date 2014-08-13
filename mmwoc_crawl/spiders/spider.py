@@ -34,9 +34,13 @@ class Spider(CrawlSpider):
 		self.site = site
 		self.muser = muser
 		self.mpass = mpass
+		self.mkey = self.site.replace('.', '').replace('/', '') + '_' + datetime.date.today().strftime('%d_%m_%y')
         
 	def file_name(self):
-		return self.path + self.site.replace('.', '').replace('/', '') + '_' + datetime.date.today().strftime('%d_%m_%y')
+		return self.path + self.key()
+
+	def key(self):
+		return self.mkey
 
 	def parse_start_url(self, response):
 		return self.parse_item(response)
