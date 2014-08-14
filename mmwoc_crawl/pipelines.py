@@ -60,9 +60,6 @@ class ProcessPipeline(object):
 			if (not word in cnt):
 				cnt[word] = 0
 			cnt[word] = cnt[word] + 1
-		ret_item = WocItem()
-		ret_item['url'] = item['url']
-		ret_item['stuff'] = cnt
 
 		for key in cnt.keys():
 			if (key in self.accumulated_words):
