@@ -66,7 +66,6 @@ class ProcessPipeline(object):
 				self.accumulated_words[key] = self.accumulated_words[key] + cnt[key]
 			else:
 				self.accumulated_words[key] = cnt[key]
-		return ret_item
 
 	def open_spider(self, spider):
 		self.file = codecs.open(spider.file_name() + '_acc.json', 'w', encoding='utf-8')
