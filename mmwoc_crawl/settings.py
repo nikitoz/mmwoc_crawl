@@ -12,8 +12,7 @@ SPIDER_MODULES = ['mmwoc_crawl.spiders']
 NEWSPIDER_MODULE = 'mmwoc_crawl.spiders'
 
 DEPTH_LIMIT = 1
-ITEM_PIPELINES = ['mmwoc_crawl.pipelines.ProcessPipeline' 
-		  , 'mmwoc_crawl.pipelines.JsonWithEncodingPipeline']
+ITEM_PIPELINES = ['mmwoc_crawl.pipelines.ProcessPipeline']
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.36 Safari/535.7'
 
