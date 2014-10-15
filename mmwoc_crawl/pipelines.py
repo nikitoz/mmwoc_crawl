@@ -17,31 +17,11 @@ import codecs
 import operator
 import datetime
 
-class MmwocCrawlPipeline(object):
-	def process_item(self, item, spider):
-		return item
-
-class JsonWithEncodingPipeline(object):
-	json_dump = ''
-
-	def open_spider(self, spider):
-		self.file = codecs.open(spider.file_name() + '.json', 'w', encoding='utf-8')
-
-	def process_item(self, item, spider):
-		line = json.dumps(dict(item), ensure_ascii=False) + "\n"
-		self.json_dump = self.json_dump + line
-		return item
-
-	def close_spider(self, spider):
-		self.file.write(self.json_dump)
-		self.file.close()
-
-
 class ProcessPipeline(object):
 	accumulated_words = {}
 	forbidden_grammeme = {'NPRO', 'CONJ', 'PRCL', 'INTJ', 'PREP', 'PNCT', 'NUMB', 'UNKN'}
 	forbidden_words = {')', '(', '-', ',', '.', '—'}
-	words_on_graph = 100
+	words_on_graph = 500
 
 	def process_item(self, item, spider):
 		tokens = nltk.word_tokenize(item['text'])
@@ -68,7 +48,8 @@ class ProcessPipeline(object):
 				self.accumulated_words[key] = cnt[key]
 
 	def open_spider(self, spider):
-		self.file = codecs.open(spider.file_name() + '_acc.json', 'w', encoding='utf-8')
+		pass
+		#self.file = codecs.open(spider.file_name() + '_acc.json', 'w', encoding='utf-8')
 
 	def push_to_mongo(self, d, _id, user, password, sitename):
 		try:
@@ -83,8 +64,8 @@ class ProcessPipeline(object):
 		
 
 	def close_spider(self, spider):
-		self.file.write(json.dumps(self.accumulated_words, ensure_ascii=False))
-		self.file.close()
+		#self.file.write(json.dumps(self.accumulated_words, ensure_ascii=False))
+		#self.file.close()
 
 		reg = re.compile(u'^[а-яА-Я]+$', re.UNICODE)
 		
@@ -92,8 +73,8 @@ class ProcessPipeline(object):
 		a, b = [ e[0] for e in sorted_data if (reg.match(e[0]) != None) ], [e[1] for e in sorted_data]
 		final_dict = {'words' : a[0:self.words_on_graph], 'occurrences' : b[0:self.words_on_graph]}
 
-		sorted_file = codecs.open(spider.file_name() + '_graph.json', 'w', encoding='utf-8')
+		'''sorted_file = codecs.open(spider.file_name() + '_graph.json', 'w', encoding='utf-8')
 		sorted_file.write(json.dumps(final_dict, ensure_ascii=False))
-		sorted_file.close()
+		sorted_file.close()'''
 		
 		self.push_to_mongo(final_dict, spider.key(), spider.mongo_user(), spider.mongo_password(), spider.site_name())
